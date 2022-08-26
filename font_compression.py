@@ -24,10 +24,21 @@ for char in range(94):
     char_bits = []
     x0 = char % 47 * 8
     y0 = char // 47 * 15
+    for x in range(x0, x0 + 8):
+        assert GOHUFONT_BITS[x + (y0 + 14) * image.width] == 0
     for y in range(y0, y0 + 15):
         for x in range(x0, x0 + 8):
             char_bits.append(GOHUFONT_BITS[x + y * image.width])
     GOHUFONT_CHARS.append(char_bits)
+
+# for char in range(94):
+#     print("#" * 18, char)
+#     for i in range(0, 120, 8):
+#         print(end="#")
+#         for x in GOHUFONT_CHARS[char][i: i + 8]:
+#             print(end=("██" if x else "  "))
+#         print("#")
+#     print("#" * 18)
 
 
 def optimized_png_file():
@@ -87,6 +98,12 @@ def zlib_compressed_chars():
     return len(zlib_compress(bytes(data))) * 8
 
 
+def zlib_compressed_dense_chars():
+    bits = [x for bits in GOHUFONT_CHARS for x in bits[:-8]]
+    data = [int("".join(map(str, bits[i: i + 8])), 2) for i in range(0, len(bits), 8)]
+    return len(zlib_compress(bytes(data))) * 8
+
+
 def theoretical_arithmetic_encoding():
     total = 0
     history = [0, 1] * 9
@@ -113,6 +130,7 @@ def theoretical_arithmetic_encoding_per_char():
 
 print()
 fs = [
+    zlib_compressed_dense_chars,
     zlib_compressed_chars,
     gzip_compressed_chars,
     gzip_compressed_bytes,
@@ -126,7 +144,7 @@ fs = [
 ]
 for bits, f in ((f(), f) for f in fs):
     name = f.__name__.replace("_", " ").title()
-    efficency = round(bits / len(GOHUFONT_BYTES) * 12.5)
+    efficency = round(bits / len(GOHUFONT_PNG) * 12.5)
     eff_str = f"{efficency:4}%"
     if bits <= 8 * len(GOHUFONT_PNG):
         eff_str = f"\x1b[92m{eff_str}\x1b[0m"
