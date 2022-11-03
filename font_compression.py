@@ -128,6 +128,18 @@ def theoretical_arithmetic_encoding_per_char():
     return ceil(total)
 
 
+def subglyph_encoding():
+    segments = {(), tuple(range(112))}
+    for char in GOHUFONT_CHARS:
+        char = set(i for i, bit in enumerate(char) if bit)
+        new_segments = set()
+        for segment in segments:
+            new_segments.add(tuple(i for i in segment if i in char))
+            new_segments.add(tuple(i for i in segment if i not in char))
+        segments = new_segments
+    return (len(segments) - 2) * len(GOHUFONT_CHARS)
+
+
 print()
 fs = [
     zlib_compressed_dense_chars,
@@ -141,6 +153,7 @@ fs = [
     encoding_using_global_probability,
     encoding_using_local_probability,
     raw_bitmask,
+    subglyph_encoding,
 ]
 for bits, f in ((f(), f) for f in fs):
     name = f.__name__.replace("_", " ").title()
