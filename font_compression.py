@@ -155,7 +155,7 @@ fs = [
     raw_bitmask,
     subglyph_encoding,
 ]
-for bits, f in ((f(), f) for f in fs):
+for bits, f in sorted((f(), f) for f in fs):
     name = f.__name__.replace("_", " ").title()
     efficency = round(bits / len(GOHUFONT_PNG) * 12.5)
     eff_str = f"{efficency:4}%"
