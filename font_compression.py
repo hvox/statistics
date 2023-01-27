@@ -140,6 +140,22 @@ def subglyph_encoding():
     return (len(segments) - 2) * len(GOHUFONT_CHARS)
 
 
+def rowtable_encoding():
+    rows = set()
+    for char in GOHUFONT_CHARS:
+        for row in (tuple(char[i: i + 8]) for i in range(0, len(char), 8)):
+            rows.add(row)
+    return log2(len(rows)) * 14 * 94 + len(rows) * 8
+
+
+def columntable_encoding():
+    columns = set()
+    for char in GOHUFONT_CHARS:
+        for col in (tuple(char[j] for j in range(i, 112, 8)) for i in range(8)):
+            columns.add(col)
+    return log2(len(columns)) * 8 * 94 + len(columns) * 14
+
+
 print()
 fs = [
     zlib_compressed_dense_chars,
@@ -154,6 +170,8 @@ fs = [
     encoding_using_local_probability,
     raw_bitmask,
     subglyph_encoding,
+    rowtable_encoding,
+    columntable_encoding,
 ]
 for bits, f in sorted((f(), f) for f in fs):
     name = f.__name__.replace("_", " ").title()
