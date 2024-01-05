@@ -15,7 +15,7 @@ def hash(data: str) -> int:
     return hash
 
 
-hashes = {}
+hashes = {0: ""}
 collisions = 0
 for word in WORDS:
     hsh = hash(word)
@@ -26,6 +26,16 @@ for word in WORDS:
     hashes[hsh] = word
 
 print(collisions, "collisions per", len(WORDS), "words")
+
+
+def test_collisions_with_empty_string():
+    for i, prefix in enumerate(WORDS):
+        msg = "searching for collisions with empty string"
+        print(f" \r{msg}: {i*len(WORDS)}", flush=True, end=" ")
+        for suffix in WORDS:
+            s = prefix + "-" + suffix
+            if not hash(s):
+                print(f"\r\x1b[91m FOUND \"{s}\"!\x1b[0m" + " " * len(msg))
 
 
 def are_collision_free(words: list[str], hash_size: Literal[1, 2] = 1):
@@ -71,4 +81,5 @@ def test_max_safe_amount_of_elements(hash_size: int):
         print(msg, flush=True, end=" \n"[test == TESTS])
 
 
+# test_collisions_with_empty_string()
 test_max_safe_amount_of_elements(hash_size=1)
