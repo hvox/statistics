@@ -25,7 +25,7 @@ for i in range(1, max(10, get_terminal_size().lines - 1)):
         #     p = 1 - p
         row.append(f"{trunc(p*100):3}%")
     row += ["  0%"] * (cols - len(row))
-    row = [colors[int(x[:-1]) // 25] + x + "\x1b[0m" for x in row]
+    row = [colors[(int(x[:-1]) > 0) + (int(x[:-1]) > 50) + (int(x[:-1]) > 90)] + x + "\x1b[0m" for x in row]
     table_size_str = f"{table_size:3}: " if table_size < 1000 else f"2^{log2(table_size):0.1f}: "
     for _ in range((len(table_size_str) - 5 + 3) // 4):
         row.pop(0)
