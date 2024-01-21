@@ -38,17 +38,23 @@ def construct_charset_from_text_in_clipboard():
 # construct_charset_from_text_in_clipboard()
 
 
+def colored_char(char: str):
+    cell = f" {char if char.isprintable() else '?'} "
+    if char in EFIGS:
+        cell = f"\x1b[102;30m{cell}\x1b[0m"
+    elif char in RUSSIAN + UKRAIN + BELARUSIAN:
+        cell = f"\x1b[103;30m{cell}\x1b[0m"
+    elif char in MATH + PORTUGUESE + TURKISH:
+        cell = f"\x1b[104;30m{cell}\x1b[0m"
+    return cell
+
+
 for i in range(32, 2048, 32):
     row = []
     for j in range(i, i + 32):
         char = chr(j)
-        cell = f" {char if char.isprintable() else '?'} "
-        if char in EFIGS:
-            cell = f"\x1b[102;30m{cell}\x1b[0m"
-        elif char in RUSSIAN + UKRAIN + BELARUSIAN:
-            cell = f"\x1b[103;30m{cell}\x1b[0m"
-        elif char in MATH + PORTUGUESE + TURKISH:
-            cell = f"\x1b[104;30m{cell}\x1b[0m"
-        row.append(cell)
+        row.append(colored_char(char))
     print(f"{i:03x}", "".join(row))
+extras = [char for char in EFIGS + RUSSIAN + UKRAIN + BELARUSIAN + MATH + PORTUGUESE + TURKISH if ord(char) >= 2048]
+print("extra: " + "".join(map(colored_char, sorted(extras))))
 print("total:", len(set(EFIGS + RUSSIAN + UKRAIN + BELARUSIAN + MATH + PORTUGUESE + TURKISH)), "letters")
